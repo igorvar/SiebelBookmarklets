@@ -1,0 +1,1 @@
+javascript:void function(){let e=prompt("Datamap Name");if(e){let p;p=SiebelApp.S_App.NewPropertySet(),p.SetProperty("MapName",e),SiebelApp.S_App.GetService("EAI Data Transformation Engine").InvokeMethod("Purge",p),p=null}}();
