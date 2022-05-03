@@ -1,0 +1,1 @@
+javascript:var view=prompt("View Name","Change Position View"); if (!!view) { SiebelApp.S_App.GotoView(view);}
