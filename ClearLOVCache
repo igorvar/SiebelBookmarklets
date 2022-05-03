@@ -1,0 +1,1 @@
+javascript: alert(SiebelApp.S_App.GetActiveView().GetActiveApplet().InvokeMethod("ClearLOVCache"))
