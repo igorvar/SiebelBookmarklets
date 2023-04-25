@@ -1,0 +1,221 @@
+//Bookmarklet:
+javascript: void function () { function SearchSessionData(Server, OsProcId, ThreadId) { var ips, resArr; if (ips = SiebelApp.S_App.NewPropertySet(), ips.SetProperty("Server", Server), ips.SetProperty("O/S Proc Id", OsProcId), ips.SetProperty("Thread Id", ThreadId), ops = SiebelApp.S_App.GetService("VIF GetSession Data BS").InvokeMethod("SessionTaskId", ips), ops = ops.GetChildByType("ResultSet").GetChildByType("TasksList"), null == ops) return new Array(0); resArr = new Array(ops.GetChildCount()); for (var i = 0; i < ops.GetChildCount() ; i++) resArr[i] = { TaskStartTime: ops.GetChild(i).GetType(), TaskId: ops.GetChild(i).GetValue() }; return resArr } function Fill(dialog) { var sessionData, dataShower, tr, input = dialog.children()[2].value; if ($(".dataShower").each(function () { this.style.visibility = "collapse" }), input = input.split("*"), !input[0] || !input[1] || !input[2]) return void alert("All parameters are required"); switch (sessionData = SearchSessionData(input[0], input[1], input[2]), sessionData.length) { case 0: dataShower = $("span#resSpan" + id)[0], dataShower.innerHTML = "Not found data about task on server '" + input[0] + "' for session O/S Proc Id '" + input[1] + "' Thread Id '" + input[2] + "'.<br/>Is environment correct?"; break; case 1: dataShower = $("span#resSpan" + id)[0], dataShower.innerHTML = sessionData[0].TaskId; break; default: dataShower = $("table#resTable" + id)[0]; for (var i = dataShower.rows.length - 1; i > 0; i--) dataShower.deleteRow(i); for (var i = 0; i < sessionData.length; i++) tr = document.createElement("tr"), tr.innerHTML = "<td>" + sessionData[i].TaskStartTime.replace(/^(\d\d)\/(\d\d)\/(.*)/, "$2.$1.$3") + "</td><td>" + sessionData[i].TaskId + "</td>", dataShower.appendChild(tr) } dataShower.style.visibility = "visible" } var id = "Test"; if ("undefined" == typeof SiebelApp) alert("It works only in Siebel OUI session"); else { var s = '<div title="Siebel Log Data" dir = "ltr" id = "' + id + '">'; s += "<label>Data for search log identificator:</label><br />", s += '<input id = "input' + id + '" placeholder="Application Server*O/S Proc Id*Thread Id" type="text" style="width: 80%;">', s += '<button id="btnFill' + id + '">Go</button>', s += '<table class="dataShower" id="resTable' + id + '" border="1" style="width: 100%; visibility:collapse"><tr><th>Task Start Time</th><th>Task Id</th></tr></table>', s += '<span class="dataShower" id="resSpan' + id + '" style="visibility:collapse" />', s += "</div>" } var $d = $(s).dialog({ modal: !0, width: 400, open: function () { $("#" + id).focus().select() }, focus: function () { $("input#input" + id)[0].focus(), $("input#input" + id)[0].onkeypress = function () { return 13 === event.charCode ? ($("button#btnFill" + id)[0].click(), !1) : !0 }, $("button#btnFill" + id)[0].onclick = function () { Fill($d) } }, close: function () { $(this).dialog("destroy").remove() }, buttons: [{ text: "Close", click: function () { $(this).dialog("close") } }] }) }();
+
+
+
+//BS VIF GetSession Data BS.SIF
+
+<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORY
+   NAME="Siebel Repository"
+   UPDATED_BY="SADMIN"
+   CREATED_BY="SADMIN"
+   FIO_PLACEHOLDER_FIO="TRUE">
+	<PROJECT
+	   ALLOW_OBJECT_LOCKING="Y"
+	   INACTIVE="N"
+	   LANGUAGE_LOCKED="HEB"
+	   LOCKED="Y"
+	   LOCKED_DATE="04/25/2023 12:51:22"
+	   NAME="Symbolic Strings"
+	   UI_FREEZE="N"
+	   LOCKED_BY_NAME="IGORVA"
+	   UPDATED_BY="SADMIN"
+	   CREATED_BY="SADMIN"
+	   FIO_PLACEHOLDER_FIO="TRUE">
+		<BUSINESS_SERVICE
+		   CACHE="Y"
+		   CLASS="CSSService"
+		   EXTERNAL_USE="Y"
+		   HIDDEN="N"
+		   INACTIVE="N"
+		   NAME="VIF GetSession Data BS"
+		   OBJECT_LANGUAGE_LOCKED="HEB"
+		   OBJECT_LOCKED="Y"
+		   OBJECT_LOCKED_DATE="04/25/2023 12:51:41"
+		   SERVER_ENABLED="N"
+		   STATE_MANAGEMENT_TYPE="Stateful"
+		   WEB_SERVICE_ENABLED="N"
+		   OBJECT_LOCKED_BY_NAME="IGORVA"
+		   UPDATED_BY="SADMIN"
+		   CREATED_BY="SADMIN">
+			<BUSINESS_SERVICE_METHOD
+			   COMMENTS="Return Task Id for search system log"
+			   HIDDEN="N"
+			   INACTIVE="N"
+			   NAME="SessionTaskId"
+			   UPDATED_BY="SADMIN"
+			   CREATED_BY="SADMIN">
+				<BUSINESS_SERVICE_METHOD_ARG
+				   DATA_TYPE="Number"
+				   HIDDEN="N"
+				   INACTIVE="N"
+				   NAME="O/S Proc Id"
+				   OPTIONAL="Y"
+				   STORAGE_TYPE="Property"
+				   TYPE="Input"
+				   UPDATED_BY="SADMIN"
+				   CREATED_BY="SADMIN">
+				</BUSINESS_SERVICE_METHOD_ARG>
+				<BUSINESS_SERVICE_METHOD_ARG
+				   DATA_TYPE="String"
+				   HIDDEN="N"
+				   INACTIVE="N"
+				   NAME="Server"
+				   OPTIONAL="Y"
+				   STORAGE_TYPE="Property"
+				   TYPE="Input"
+				   UPDATED_BY="SADMIN"
+				   CREATED_BY="SADMIN">
+				</BUSINESS_SERVICE_METHOD_ARG>
+				<BUSINESS_SERVICE_METHOD_ARG
+				   DATA_TYPE="Number"
+				   HIDDEN="N"
+				   INACTIVE="Y"
+				   NAME="TaskId"
+				   OPTIONAL="N"
+				   STORAGE_TYPE="Property"
+				   TYPE="Output"
+				   UPDATED_BY="SADMIN"
+				   CREATED_BY="SADMIN">
+				</BUSINESS_SERVICE_METHOD_ARG>
+				<BUSINESS_SERVICE_METHOD_ARG
+				   DATA_TYPE="Hierarchy"
+				   HIDDEN="N"
+				   INACTIVE="N"
+				   NAME="TasksList"
+				   OPTIONAL="N"
+				   STORAGE_TYPE="Hierarchy"
+				   TYPE="Input"
+				   UPDATED_BY="SADMIN"
+				   CREATED_BY="SADMIN">
+				</BUSINESS_SERVICE_METHOD_ARG>
+				<BUSINESS_SERVICE_METHOD_ARG
+				   DATA_TYPE="Number"
+				   HIDDEN="N"
+				   INACTIVE="N"
+				   NAME="Thread Id"
+				   OPTIONAL="Y"
+				   STORAGE_TYPE="Property"
+				   TYPE="Input"
+				   UPDATED_BY="SADMIN"
+				   CREATED_BY="SADMIN">
+				</BUSINESS_SERVICE_METHOD_ARG>
+				<BUSINESS_SERVICE_METHOD_ARG
+				   COMMENTS="IgorV. 17.04.22.The username in the current session does not always match the name in the database."
+				   DATA_TYPE="String"
+				   HIDDEN="N"
+				   INACTIVE="Y"
+				   NAME="User Login"
+				   OPTIONAL="Y"
+				   STORAGE_TYPE="Property"
+				   TYPE="Input"
+				   UPDATED_BY="SADMIN"
+				   CREATED_BY="SADMIN">
+				</BUSINESS_SERVICE_METHOD_ARG>
+			</BUSINESS_SERVICE_METHOD>
+			<BUSINESS_SERVICE_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="Service_PreCanInvokeMethod"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="function Service_PreCanInvokeMethod (MethodName, &amp;CanInvoke)
+{
+	return (ContinueOperation);
+}"
+			   SEQUENCE="2"
+			   UPDATED_BY="SADMIN"
+			   CREATED_BY="SADMIN">
+			</BUSINESS_SERVICE_SERVER_SCRIPT>
+			<BUSINESS_SERVICE_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="Service_PreInvokeMethod"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="function Service_PreInvokeMethod (MethodName, Inputs: PropertySet, Outputs:PropertySet)
+{
+	switch (MethodName)
+	{
+		case &quot;SessionTaskId&quot;: //IgorV.
+			SessionTaskId(Inputs, Outputs);
+			break;
+		default:
+			return (ContinueOperation);
+	}
+	return (CancelOperation);
+}"
+			   SEQUENCE="3"
+			   UPDATED_BY="SADMIN"
+			   CREATED_BY="SADMIN">
+			</BUSINESS_SERVICE_SERVER_SCRIPT>
+			<BUSINESS_SERVICE_SERVER_SCRIPT
+			   INACTIVE="N"
+			   NAME="SessionTaskId"
+			   PROGRAM_LANGUAGE="JS"
+			   SCRIPT="function SessionTaskId(I:PropertySet, O:PropertySet)
+{
+// IgorV. 
+/* return property set TasksList
+PropertySet: Type: &apos;TasksList&apos; Value: &apos;&apos; PropertyCount: 0 ChildCount: 3
+CHILD
+  PropertySet: Type: &apos;12/31/2000 05:00:01&apos; Value: &apos;15728720&apos; PropertyCount: 0 ChildCount: 0
+  End PS
+CHILD
+  PropertySet: Type: &apos;12/31/2000 01:00:03&apos; Value: &apos;15728700&apos; PropertyCount: 0 ChildCount: 0
+  End PS
+CHILD
+  PropertySet: Type: &apos;12/31/2000 20:40:32&apos; Value: &apos;15728681&apos; PropertyCount: 0 ChildCount: 0
+  End PS
+End PS
+*/
+	try
+	{
+		var bc:BusComp = null; 
+		var ops:PropertySet;
+		bc = TheApplication().GetBusObject(&quot;Server Admin Runtime&quot;).GetBusComp(&quot;Enterprise Task Persistence&quot;);
+		bc.ClearToQuery();
+		bc.SetSearchSpec(&quot;O/S Proc Id&quot;, I.GetProperty(&quot;O/S Proc Id&quot;));
+		bc.SetSearchSpec(&quot;Thread Id&quot;, I.GetProperty(&quot;Thread Id&quot;));
+		//bc.SetSearchSpec(&quot;User Login&quot;, &quot;~ = &apos;&quot; + I.GetProperty(&quot;User Login&quot;) + &quot;&apos;&quot;);
+		bc.SetSearchSpec(&quot;Server Host Name&quot;, &quot;~ = &apos;&quot; + I.GetProperty(&quot;Server&quot;) + &quot;&apos;&quot;);
+		bc.ActivateField(&quot;Task Id&quot;);
+		bc.ActivateField(&quot;Task Start Time&quot;);
+		bc.SetSortSpec(&quot;Task Start Time(DESCENDING)&quot;);
+		bc.ExecuteQuery(ForwardOnly);
+	
+		ops = TheApplication().NewPropertySet();
+		ops.SetType(&quot;TasksList&quot;);
+	
+		//WriteToLog(&quot;SearchExpr = &quot; + bc.GetSearchExpr(), false);
+	
+		if (!bc.FirstRecord()) return;
+		do
+		{
+			ops.AddChild(TheApplication().NewPropertySet());
+			ops.GetChild(ops.GetChildCount() - 1).SetType(bc.GetFieldValue(&quot;Task Start Time&quot;));
+			ops.GetChild(ops.GetChildCount() - 1).SetValue(bc.GetFieldValue(&quot;Task Id&quot;));
+	
+		}while (bc.NextRecord())
+	
+		O.AddChild(ops.Copy());
+		
+		ops = null;
+		bc = null;
+	}
+	catch(e)
+	{
+		//WriteToLog(e.message, true)
+	}
+	finally
+	{
+		bc = null;
+		ops = null;
+	}
+
+	//function WriteToLog(Message, IsError){WriteLogRecord(&quot;BS&quot;, this.Name(), &quot;SessionTaskId&quot;, Message, IsError);}
+}"
+			   SEQUENCE="1"
+			   UPDATED_BY="SADMIN"
+			   CREATED_BY="SADMIN">
+			</BUSINESS_SERVICE_SERVER_SCRIPT>
+		</BUSINESS_SERVICE>
+	</PROJECT>
+</REPOSITORY>
